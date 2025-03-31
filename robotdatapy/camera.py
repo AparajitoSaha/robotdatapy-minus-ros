@@ -1,6 +1,5 @@
 import numpy as np
 from dataclasses import dataclass
-from rosbags.highlevel import AnyReader
 from pathlib import Path
 
 from robotdatapy.exceptions import MsgNotFound
@@ -62,19 +61,7 @@ class CameraParams:
     width: int  = None
     height: int = None
     T: np.array = None
-
-    @classmethod
-    def from_bag(cls, file, topic):
-        with AnyReader([Path(file)]) as reader:
-            connections = [x for x in reader.connections if x.topic == topic]
-            if len(connections) == 0:
-                assert False, f"topic {topic} not found in bag file {file}"
-            for (connection, timestamp, rawdata) in reader.messages(connections=connections):
-                if connection.topic == topic:
-                    msg = reader.deserialize(rawdata, connection.msgtype)
-                    return cls.from_msg(msg)
-        raise MsgNotFound(topic)
-    
+   
     @classmethod
     def from_msg(cls, msg):
         try:
